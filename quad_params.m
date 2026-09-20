@@ -1,3 +1,11 @@
+%%
+
+h = 0.2;     % m
+A = 0.2*0.08*2;        % m^2
+m = 1;       % kg
+g = 9.81; 
+rho = 1000;   % water density [kg/m^3]
+
 %% Quadrotor parameters
 
 m = 1.5;              % mass [kg]
