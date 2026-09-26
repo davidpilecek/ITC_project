@@ -4,17 +4,17 @@ h = 0.20;               % Hull height [m]
 
 L = 0.20;               % Hull length [m]
 W = 0.08;               % Hull width [m]
-A = 2*L*W;              % Total hull planform area [m^2]
+A = 2*L*W;              % Total hull platform area
 
-m = 1.30;               % Vehicle mass [kg]
-g = 9.81;               % Gravity [m/s^2]
+m = 1.30;               % Vehicle mass 
+g = 9.81;               % Gravity 
 
-rho_air   = 1.225;      % Air density [kg/m^3]
-rho_water = 1000;       % Water density [kg/m^3]
+rho_air   = 1.225;      % Air density 
+rho_water = 1000;       % Water density
 
-Fg = m*g;               % Vehicle weight [N]
+Fg = m*g;               % Gravity force
 
-V_max = A*h;            % Maximum displaced volume [m^3]
+V_max = A*h;            % Max displaced volume
 Fb_max = rho_water*g*V_max;
 
 c_float = m/(rho_water*A);
