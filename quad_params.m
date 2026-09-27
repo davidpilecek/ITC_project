@@ -20,6 +20,17 @@ Fb_max = rho_water*g*V_max;
 c_float = m/(rho_water*A);
 z_float = h/2 - c_float;
 
+wc = 4;       % rad/s
+wo = 5*wc;      % rad/s
+b0 = 1/1;
+
+beta1 = 3*wo;       % 45
+beta2 = 3*wo^2;     % 675
+beta3 = wo^3;       % 3375
+
+kp = wc^2;          % 9
+kd = 2*wc;          % 6
+
 %% Quadrotor parameters
 
 m = 1.5;              % mass [kg]
