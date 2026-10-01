@@ -3,7 +3,7 @@
 h = 0.20;               % Hull height [m]
 
 L = 0.20;               % Hull length [m]
-W = 0.08;               % Hull width [m]
+% W = 0.08;               % Hull width [m]
 A = 2*L*W;              % Total hull platform area
 
 m = 1.30;               % Vehicle mass 
@@ -20,7 +20,10 @@ Fb_max = rho_water*g*V_max;
 c_float = m/(rho_water*A);
 z_float = h/2 - c_float;
 
-wc = 4;       % rad/s
+
+%%
+
+wc = 7;       % rad/s
 wo = 5*wc;      % rad/s
 b0 = 1/1;
 
