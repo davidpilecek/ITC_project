@@ -1,10 +1,12 @@
 %% Vehicle parameters
+clc;clear;
 
+%%
 h = 0.20;               % Hull height [m]
 
 L = 0.20;               % Hull length [m]
-% W = 0.08;               % Hull width [m]
-A = 2*L*W;              % Total hull platform area
+Width = 0.08;               % Hull width [m]
+Area = 2*L*Width;              % Total hull platform area
 
 m = 1.30;               % Vehicle mass 
 g = 9.81;               % Gravity 
@@ -14,18 +16,26 @@ rho_water = 1000;       % Water density
 
 Fg = m*g;               % Gravity force
 
-V_max = A*h;            % Max displaced volume
+V_max = Area*h;            % Max displaced volume
 Fb_max = rho_water*g*V_max;
 
-c_float = m/(rho_water*A);
+c_float = m/(rho_water*Area);
 z_float = h/2 - c_float;
 
+Trot = 0.01;
+
+m_prop = 0.01;
+W = m + 4*m_prop;
+
+init_h = 0.2;
+end_h = 0.0;
 
 %%
 
 wc = 7;       % rad/s
-wo = 5*wc;      % rad/s
-b0 = 1/1;
+
+wo = 10*wc;      % rad/s
+b0 = 1/W;
 
 beta1 = 3*wo;       % 45
 beta2 = 3*wo^2;     % 675
@@ -33,6 +43,39 @@ beta3 = wo^3;       % 3375
 
 kp = wc^2;          % 9
 kd = 2*wc;          % 6
+
+
+%%
+
+L = 0.1;
+l = sqrt(2)*L;
+
+KQ = 2e-7;
+Kf = 1.072e-5;
+
+K = KQ/Kf;
+A = [ ...
+     1,  1,  1,  1;
+    -l/sqrt(2),  l/sqrt(2),  l/sqrt(2), -l/sqrt(2);
+     l/sqrt(2),  l/sqrt(2), -l/sqrt(2), -l/sqrt(2);
+    -K, K, -K, K];
+
+Alloc = [ ...
+    1/(4*Kf), -sqrt(2)/(4*Kf*l),  sqrt(2)/(4*Kf*l), -1/(4*K*Kf);
+    1/(4*Kf),  sqrt(2)/(4*Kf*l),  sqrt(2)/(4*Kf*l),  1/(4*K*Kf);
+    1/(4*Kf),  sqrt(2)/(4*Kf*l), -sqrt(2)/(4*Kf*l), -1/(4*K*Kf);
+    1/(4*Kf), -sqrt(2)/(4*Kf*l), -sqrt(2)/(4*Kf*l),  1/(4*K*Kf)];
+
+%%
+U_cmd = [12.753; 0.01; 0; 0]; % Roll torque
+
+Omega_sq = Alloc*U_cmd;
+
+assert(all(Omega_sq >= 0))
+
+U_actual = A*(Kf*Omega_sq);
+
+disp(U_actual)
 
 %% Quadrotor parameters
 
