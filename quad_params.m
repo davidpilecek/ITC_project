@@ -27,22 +27,22 @@ Trot = 0.01;
 m_prop = 0.01;
 W = m + 4*m_prop;
 
-init_h = 0.2;
-end_h = 0.0;
+init_h = 0.158;
+end_h = 0.058;
 
 %%
 
-wc = 7;       % rad/s
+wc = 10;       % rad/s
 
-wo = 10*wc;      % rad/s
+wo = 6*wc;      % rad/s
 b0 = 1/W;
 
-beta1 = 3*wo;       % 45
-beta2 = 3*wo^2;     % 675
-beta3 = wo^3;       % 3375
+beta1 = 3*wo;     
+beta2 = 3*wo^2;    
+beta3 = wo^3;       
 
-kp = wc^2;          % 9
-kd = 2*wc;          % 6
+kp = wc^2;          
+kd = 2*wc;          
 
 
 %%
