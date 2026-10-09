@@ -31,10 +31,13 @@ init_h = 0.158;
 end_h = 0.058;
 
 %%
+U_max = 70;
 
-wc = 10;       % rad/s
+Ts = 0.01;
 
-wo = 6*wc;      % rad/s
+wc = 12;       % rad/s
+
+wo = 8*wc;      % rad/s
 b0 = 1/W;
 
 beta1 = 3*wo;     
@@ -44,6 +47,8 @@ beta3 = wo^3;
 kp = wc^2;          
 kd = 2*wc;          
 
+r0 = 0.9;
+h0 = Ts;
 
 %%
 
@@ -65,53 +70,3 @@ Alloc = [ ...
     1/(4*Kf),  sqrt(2)/(4*Kf*l),  sqrt(2)/(4*Kf*l),  1/(4*K*Kf);
     1/(4*Kf),  sqrt(2)/(4*Kf*l), -sqrt(2)/(4*Kf*l), -1/(4*K*Kf);
     1/(4*Kf), -sqrt(2)/(4*Kf*l), -sqrt(2)/(4*Kf*l),  1/(4*K*Kf)];
-
-%%
-U_cmd = [12.753; 0.01; 0; 0]; % Roll torque
-
-Omega_sq = Alloc*U_cmd;
-
-assert(all(Omega_sq >= 0))
-
-U_actual = A*(Kf*Omega_sq);
-
-disp(U_actual)
-
-%% Quadrotor parameters
-
-m = 1.5;              % mass [kg]
-g = 9.81;             % gravity [m/s^2]
-
-% Moments of inertia
-Jx = 0.02;            % [kg m^2]
-Jy = 0.02;            % [kg m^2]
-Jz = 0.04;            % [kg m^2]
-
-J = diag([Jx Jy Jz]);
-
-rho_water = 1000;       % water density [kg/m^3]
-
-hull_width  = 0.30;     % hull width [m]
-hull_length = 0.40;     % hull length [m]
-hull_height = 0.20;     % hull height [m]
-
-V_hull = hull_width*hull_length*hull_height;
-
-z_water = 0;            % water surface [m]
-
-x0 = [ ...
-    0;  % x
-    0;  % y
-    2;  % z
-
-    0;  % vx
-    0;  % vy
-    0;  % vz
-
-    0;  % phi
-    0;  % theta
-    0;  % psi
-
-    0;  % p
-    0;  % q
-    0]; % r
