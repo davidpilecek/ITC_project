@@ -50,6 +50,13 @@ kd = 2*wc;
 r0 = 0.9;
 h0 = Ts;
 
+Ix = 4.33e-3;
+Iy = 4.33e-3;
+Iz = 8.67e-3;
+
+
+inertia_mx = [Ix; Iy; Iz;];
+
 %%
 
 L = 0.1;
