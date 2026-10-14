@@ -30,7 +30,7 @@ W = m + 4*m_prop;
 init_h = 0.158;
 end_h = 0.058;
 
-%%
+%
 U_max = 70;
 
 Ts = 0.01;
@@ -47,7 +47,7 @@ beta3 = wo^3;
 kp = wc^2;          
 kd = 2*wc;          
 
-r0 = 0.9;
+r0 = 1.5;
 h0 = Ts;
 
 Ix = 4.33e-3;
@@ -57,7 +57,7 @@ Iz = 8.67e-3;
 
 inertia_mx = [Ix; Iy; Iz;];
 
-%%
+%
 
 L = 0.1;
 l = sqrt(2)*L;
