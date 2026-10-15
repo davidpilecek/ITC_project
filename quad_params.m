@@ -5,8 +5,8 @@ clc;clear;
 h = 0.20;               % Hull height [m]
 
 L = 0.20;               % Hull length [m]
-Width = 0.08;               % Hull width [m]
-Area = 2*L*Width;              % Total hull platform area
+Width = 0.08;           % Hull width [m]
+Area = 2*L*Width;       % Total hull platform area
 
 m = 1.30;               % Vehicle mass 
 g = 9.81;               % Gravity 
@@ -27,11 +27,10 @@ Trot = 0.01;
 m_prop = 0.01;
 W = m + 4*m_prop;
 
-init_h = 0.158;
-end_h = 0.058;
+init_h = 0.03;
+end_h = 0.03;
 
-%
-U_max = 70;
+U_max = 4*17;
 
 Ts = 0.01;
 
@@ -47,13 +46,12 @@ beta3 = wo^3;
 kp = wc^2;          
 kd = 2*wc;          
 
-r0 = 1.5;
+r0 = 3;
 h0 = Ts;
 
 Ix = 4.33e-3;
 Iy = 4.33e-3;
 Iz = 8.67e-3;
-
 
 inertia_mx = [Ix; Iy; Iz;];
 
