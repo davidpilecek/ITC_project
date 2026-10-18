@@ -66,7 +66,7 @@ beta2_y = 3*wo_y^2;
 beta3_y = wo_y^3;
 
 % Roll
-wc_roll = 30;         % rad/s
+wc_roll = 15;         % rad/s
 wo_roll = 5*wc_roll;  % rad/s
 b0_roll = 1/Ixx;
 beta1_roll = 3*wo_roll;
@@ -74,7 +74,7 @@ beta2_roll = 3*wo_roll^2;
 beta3_roll = wo_roll^3;
 
 % Pitch
-wc_pitch = 30;          % rad/s
+wc_pitch = 15;          % rad/s
 wo_pitch = 5*wc_pitch;  % rad/s
 b0_pitch = 1/Iyy;
 beta1_pitch = 3*wo_pitch;
@@ -82,7 +82,7 @@ beta2_pitch = 3*wo_pitch^2;
 beta3_pitch = wo_pitch^3;
 
 % Yaw
-wc_yaw = 10;          % rad/s
+wc_yaw = 5;          % rad/s
 wo_yaw = 8*wc_yaw;    % rad/s
 b0_yaw = 1/Izz;
 beta1_yaw = 3*wo_yaw;
@@ -92,7 +92,7 @@ beta3_yaw = wo_yaw^3;
 r0_position = 0.2;
 h0 = Ts;
 
-r0_angle = 5;
+r0_angle = 3;
 
 arm_L = 0.3;
 
