@@ -76,7 +76,7 @@ beta3_y = wo_y^3;
 % Pitch
 wc_pitch = 20;          % rad/s
 wo_pitch = 5*wc_pitch;  % rad/s
-b0_pitch = 1/Iyy;
+b0_pitch = 1/Ixx;
 beta1_pitch = 3*wo_pitch;
 beta2_pitch = 3*wo_pitch^2;
 beta3_pitch = wo_pitch^3;
