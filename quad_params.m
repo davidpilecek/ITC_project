@@ -49,14 +49,6 @@ beta1_z = 3*wo_z;
 beta2_z = 3*wo_z^2;
 beta3_z = wo_z^3;
 
-% Roll
-wc_roll = 20;         % rad/s
-wo_roll = 5*wc_roll;  % rad/s
-b0_roll = 1/Ixx;
-beta1_roll = 3*wo_roll;
-beta2_roll = 3*wo_roll^2;
-beta3_roll = wo_roll^3;
-
 % X Position
 wc_x = 1;            % rad/s
 wo_x = 5*wc_x;        % rad/s
@@ -73,10 +65,19 @@ beta1_y = 3*wo_y;
 beta2_y = 3*wo_y^2;
 beta3_y = wo_y^3;
 
+% Roll
+wc_roll = 20;         % rad/s
+wo_roll = 5*wc_roll;  % rad/s
+b0_roll = 1/Ixx;
+beta1_roll = 3*wo_roll;
+beta2_roll = 3*wo_roll^2;
+beta3_roll = wo_roll^3;
+
+
 % Pitch
 wc_pitch = 20;          % rad/s
 wo_pitch = 5*wc_pitch;  % rad/s
-b0_pitch = 1/Ixx;
+b0_pitch = 1/Iyy;
 beta1_pitch = 3*wo_pitch;
 beta2_pitch = 3*wo_pitch^2;
 beta3_pitch = wo_pitch^3;
@@ -92,8 +93,7 @@ beta3_yaw = wo_yaw^3;
 r0_position = 0.5;
 h0 = Ts;
 
-r0_angle = 3;
-
+r0_angle = 10;
 
 arm_L = 0.3;
 
