@@ -89,8 +89,11 @@ beta1_yaw = 3*wo_yaw;
 beta2_yaw = 3*wo_yaw^2;
 beta3_yaw = wo_yaw^3;
 
-r0 = 3;
+r0_position = 0.5;
 h0 = Ts;
+
+r0_angle = 3;
+
 
 arm_L = 0.3;
 
