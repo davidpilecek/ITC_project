@@ -60,7 +60,7 @@ beta3_roll = wo_roll^3;
 % X Position
 wc_x = 1;            % rad/s
 wo_x = 5*wc_x;        % rad/s
-b0_x = 1/m_nom;
+b0_x = 1/W;
 beta1_x = 3*wo_x;
 beta2_x = 3*wo_x^2;
 beta3_x = wo_x^3;
@@ -68,7 +68,7 @@ beta3_x = wo_x^3;
 % Y Position
 wc_y = 1;            % rad/s
 wo_y = 5*wc_y;        % rad/s
-b0_y = 1/1;
+b0_y = 1/W;
 beta1_y = 3*wo_y;
 beta2_y = 3*wo_y^2;
 beta3_y = wo_y^3;
