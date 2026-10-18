@@ -35,9 +35,9 @@ U_max = 4*17;
 
 Ts = 0.01;
 
-Ixx = 4.33e-3;
-Iyy = 4.33e-3;
-Izz = 8.67e-3;
+Ixx = 0.0118;
+Iyy = 0.0118;
+Izz = 0.0228;
 
 inertia_mx = [Ixx; Iyy; Izz;];
 
@@ -75,7 +75,7 @@ beta3_y = wo_y^3;
 
 % Pitch
 wc_pitch = 20;          % rad/s
-wo_pitch = 8*wc_pitch;  % rad/s
+wo_pitch = 5*wc_pitch;  % rad/s
 b0_pitch = 1/Iyy;
 beta1_pitch = 3*wo_pitch;
 beta2_pitch = 3*wo_pitch^2;
