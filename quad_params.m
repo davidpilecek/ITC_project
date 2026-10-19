@@ -89,10 +89,10 @@ beta1_yaw = 3*wo_yaw;
 beta2_yaw = 3*wo_yaw^2;
 beta3_yaw = wo_yaw^3;
 
-r0_position = 0.2;
-h0 = Ts;
+r0_position = 1;
+h0 = Ts*2;
 
-r0_angle = 3;
+r0_angle = 5;
 
 arm_L = 0.3;
 
@@ -104,6 +104,58 @@ Alloc = [ kf,     kf,     kf,     kf;
         -kf*arm_L,      0,   kf*arm_L,      0;
           km,    -km,     km,    -km ]
 
-K_alloc = Alloc \ diag([m_nom, 1, 1, 1])
+K_alloc = Alloc \ diag([W, 1, 1, 1])
 
 Alloc_2 = inv(K_alloc);
+
+%%
+% Trajectory parameters
+altitude = 3;       % m
+Ax = 2;             % X amplitude (m)
+Ay = 1;             % Y amplitude (m)
+
+tTakeoff = 6;       % Takeoff duration (s)
+tLoop = 20;         % Duration of one figure-eight (s)
+nLoops = 2;         % Number of figure-eights
+nPerLoop = 16;      % Segments per figure-eight
+
+% Parametric figure-eight
+theta = linspace(0, 2*pi*nLoops, ...
+                 nPerLoop*nLoops + 1);
+
+x = Ax*sin(theta);
+y = Ay*sin(2*theta);
+z = altitude*ones(size(theta));
+jerkBC = nan(size(waypoints));
+% Waypoints: 3 x N matrix
+% Rows correspond to X, Y, Z
+waypoints = [0, x;
+             0, y;
+             0, z];
+
+% TimePoints: 1 x N row vector
+timePoints = [0, tTakeoff + ...
+    (0:nPerLoop*nLoops)*(tLoop/nPerLoop)];
+
+% Boundary conditions
+velBC = nan(size(waypoints));
+accelBC = nan(size(waypoints));
+
+% Start, takeoff completion and final hover
+velBC(:,[1 2 end]) = 0;
+accelBC(:,[1 2 end]) = 0;
+
+% Keep altitude constant during figure-eights
+velBC(3,2:end) = 0;
+accelBC(3,2:end) = 0;
+
+% Plot waypoints
+figure;
+plot3(waypoints(1,:), waypoints(2,:), ...
+      waypoints(3,:), 'o-');
+grid on;
+axis equal;
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');
+title('3D Figure-Eight Waypoints');
