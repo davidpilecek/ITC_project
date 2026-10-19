@@ -8,7 +8,6 @@ L = 0.20;               % Hull length [m]
 Width = 0.08;           % Hull width [m]
 Area = 2*L*Width;       % Total hull platform area
 
-m = 1.30;               % Vehicle mass 
 g = 9.81;               % Gravity 
 
 rho_air   = 1.225;      % Air density 
@@ -24,8 +23,8 @@ z_float = h/2 - c_float;
 
 Trot = 0.01;
 
-m_prop = 0.05;
-m_nom = m + 4*m_prop;
+m_prop = 0.01;
+m_nom = 1.30 + 4*m_prop;
 W = m_nom;
 
 init_h = 0.03;
@@ -66,16 +65,16 @@ beta2_y = 3*wo_y^2;
 beta3_y = wo_y^3;
 
 % Roll
-wc_roll = 15;         % rad/s
-wo_roll = 5*wc_roll;  % rad/s
+wc_roll = 20;         % rad/s
+wo_roll = 8*wc_roll;  % rad/s
 b0_roll = 1/Ixx;
 beta1_roll = 3*wo_roll;
 beta2_roll = 3*wo_roll^2;
 beta3_roll = wo_roll^3;
 
 % Pitch
-wc_pitch = 15;          % rad/s
-wo_pitch = 5*wc_pitch;  % rad/s
+wc_pitch = 20;          % rad/s
+wo_pitch = 8*wc_pitch;  % rad/s
 b0_pitch = 1/Iyy;
 beta1_pitch = 3*wo_pitch;
 beta2_pitch = 3*wo_pitch^2;
@@ -89,10 +88,10 @@ beta1_yaw = 3*wo_yaw;
 beta2_yaw = 3*wo_yaw^2;
 beta3_yaw = wo_yaw^3;
 
-r0_position = 0.2;
+r0_position = 1;
 h0 = Ts;
 
-r0_angle = 3;
+r0_angle = 5;
 
 arm_L = 0.3;
 
@@ -108,7 +107,7 @@ K_alloc = Alloc \ diag([W, 1, 1, 1])
 
 Alloc_2 = inv(K_alloc);
 
-
+%%
 % Trajectory parameters
 altitude = 3;       % m
 Ax = 2;             % X amplitude (m)
@@ -126,7 +125,7 @@ theta = linspace(0, 2*pi*nLoops, ...
 x = Ax*sin(theta);
 y = Ay*sin(2*theta);
 z = altitude*ones(size(theta));
-
+jerkBC = nan(size(waypoints));
 % Waypoints: 3 x N matrix
 % Rows correspond to X, Y, Z
 waypoints = [0, x;
