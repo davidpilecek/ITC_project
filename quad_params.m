@@ -13,19 +13,20 @@ g = 9.81;               % Gravity
 rho_air   = 1.225;      % Air density 
 rho_water = 1000;       % Water density
 
-Fg = m*g;               % Gravity force
-
 V_max = Area*h;            % Max displaced volume
 Fb_max = rho_water*g*V_max;
 
-c_float = m/(rho_water*Area);
-z_float = h/2 - c_float;
 
 Trot = 0.01;
 
 m_prop = 0.01;
 m_nom = 1.30 + 4*m_prop;
 W = m_nom;
+
+Fg = W*g;               % Gravity force
+
+c_float = W/(rho_water*Area);
+z_float = h/2 - c_float;
 
 init_h = 0.03;
 end_h = 0.03;
@@ -49,16 +50,16 @@ beta2_z = 3*wo_z^2;
 beta3_z = wo_z^3;
 
 % X Position
-wc_x = 1.5;            % rad/s
-wo_x = 8*wc_x;        % rad/s
+wc_x = 2;            % rad/s
+wo_x = 10*wc_x;        % rad/s
 b0_x = 1/W;
 beta1_x = 3*wo_x;
 beta2_x = 3*wo_x^2;
 beta3_x = wo_x^3;
 
 % Y Position
-wc_y = 1.5;            % rad/s
-wo_y = 15*wc_y;        % rad/s
+wc_y = 2;            % rad/s
+wo_y = 10*wc_y;        % rad/s
 b0_y = 1/W;
 beta1_y = 3*wo_y;
 beta2_y = 3*wo_y^2;
@@ -125,7 +126,7 @@ theta = linspace(0, 2*pi*nLoops, ...
 x = Ax*sin(theta);
 y = Ay*sin(2*theta);
 z = altitude*ones(size(theta));
-jerkBC = nan(size(waypoints));
+
 % Waypoints: 3 x N matrix
 % Rows correspond to X, Y, Z
 waypoints = [0, x;
@@ -148,13 +149,83 @@ accelBC(:,[1 2 end]) = 0;
 velBC(3,2:end) = 0;
 accelBC(3,2:end) = 0;
 
+jerkBC = nan(size(waypoints));
+
+
+
+% Include takeoff position at the origin
+markerPos = waypoints.';     % N x 3
+
+N = size(markerPos, 1);
+
+% Marker size and color
+markerSize = 0.1 * ones(N, 1);
+markerColor = repmat([0 1 0], N, 1);
+
+% N x 7 matrix
+markers = [markerPos, markerSize, markerColor];
+
 % Plot waypoints
-figure;
-plot3(waypoints(1,:), waypoints(2,:), ...
-      waypoints(3,:), 'o-');
+% figure;
+% plot3(waypoints(1,:), waypoints(2,:), ...
+%        waypoints(3,:), 'o-');
+% grid on;
+% axis equal;
+% % xlabel('X (m)');
+% % ylabel('Y (m)');
+% % zlabel('Z (m)');
+% % title('3D Figure-Eight Waypoints');
+
+%%
+
+
+% Extract positions
+ref = squeeze(out.xyz_reference.Data);
+actual = squeeze(out.xyz_recorded.Data);
+
+% Ensure N x 3 matrices
+if size(ref,2) ~= 3
+    ref = ref.';
+end
+
+if size(actual,2) ~= 3
+    actual = actual.';
+end
+
+% Create figure
+figure('Color', 'w');
+hold on;
 grid on;
+box on;
+
+% Reference trajectory
+plot3(ref(:,1), ref(:,2), ref(:,3), ...
+    'b--', 'LineWidth', 2);
+
+% Actual trajectory (ADRC)
+plot3(actual(:,1), actual(:,2), actual(:,3), ...
+    'r-', 'LineWidth', 1.8);
+
+% Start position
+plot3(actual(1,1), actual(1,2), actual(1,3), ...
+    'gs', 'MarkerSize', 8, ...
+    'MarkerFaceColor', 'g');
+
+% End position
+plot3(actual(end,1), actual(end,2), actual(end,3), ...
+    'r^', 'MarkerSize', 8, ...
+    'MarkerFaceColor', 'r');
+
+% Labels and title
+xlabel('x (m)');
+ylabel('y (m)');
+zlabel('z (m)');
+title('3D Trajectory: Figure-Eight with ADRC');
+
+legend('Reference', 'ADRC', 'Start', 'End', ...
+    'Location', 'best');
+
+% Appearance
 axis equal;
-xlabel('X (m)');
-ylabel('Y (m)');
-zlabel('Z (m)');
-title('3D Figure-Eight Waypoints');
+view(35, 25);
+set(gca, 'FontSize', 11);
