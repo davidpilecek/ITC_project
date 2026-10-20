@@ -20,8 +20,7 @@ Fb_max = rho_water*g*V_max;
 Trot = 0.01;
 
 m_prop = 0.01;
-m_nom = 1.30 + 4*m_prop;
-W = m_nom;
+W = 1.30 + 4*m_prop;
 
 Fg = W*g;               % Gravity force
 
@@ -33,7 +32,7 @@ end_h = 0.03;
 
 U_max = 4*17;
 
-Ts = 0.01;
+Ts = 0.04;
 
 Ixx = 0.0118;
 Iyy = 0.0118;
@@ -106,9 +105,8 @@ Alloc = [ kf,     kf,     kf,     kf;
 
 K_alloc = Alloc \ diag([W, 1, 1, 1])
 
-Alloc_2 = inv(K_alloc);
 
-%%
+%
 % Trajectory parameters
 altitude = 3;       % m
 Ax = 2;             % X amplitude (m)
