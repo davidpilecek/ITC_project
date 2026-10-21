@@ -40,7 +40,7 @@ Izz = 0.0228;
 inertia_mx = [Ixx; Iyy; Izz;];
 
 % Altitude
-wc_z = 3;          % rad/s
+wc_z = 5;          % rad/s
 wo_z = 5*wc_z;    % rad/s
 b0_z = 1;
 beta1_z = 3*wo_z;
