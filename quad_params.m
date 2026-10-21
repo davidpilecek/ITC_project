@@ -16,8 +16,7 @@ rho_water = 1000;       % Water density
 V_max = Area*h;            % Max displaced volume
 Fb_max = rho_water*g*V_max;
 
-
-Trot = 0.01;
+Trot = 0.04;
 
 m_prop = 0.01;
 W = 1.30 + 4*m_prop;
@@ -32,7 +31,7 @@ end_h = 0.03;
 
 U_max = 4*17;
 
-Ts = 0.04;
+Ts = 0.01;
 
 Ixx = 0.0118;
 Iyy = 0.0118;
