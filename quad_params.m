@@ -16,7 +16,7 @@ rho_water = 1000;       % Water density
 V_max = Area*h;            % Max displaced volume
 Fb_max = rho_water*g*V_max;
 
-Trot = 0.04;
+Trot = 0.01;
 
 m_prop = 0.01;
 W = 1.30 + 4*m_prop;
@@ -49,18 +49,14 @@ adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
 % Discrete-time ADRC
 adrcD.z     = makeADRC_D(5,   5,  1,     Ts);
-adrcD.x     = makeADRC_D(1.5, 10, 1/W,   Ts);
+adrcD.x     = makeADRC_D(2, 8, 1/W,   Ts);
 adrcD.y     = makeADRC_D(1.5, 10, 1/W,   Ts);
 adrcD.roll  = makeADRC_D(25,  3,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(25,  3,  1/Iyy, Ts);
 adrcD.yaw   = makeADRC_D(5,   8,  1/Izz, Ts);
 
-
-
 r0_position = 3;
 h0 = Ts;
-
-r0_angle = 10;
 
 arm_L = 0.3;
 
