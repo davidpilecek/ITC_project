@@ -21,6 +21,12 @@ function p = makeADRC_D(wc, kESO, b0, Ts)
     zCL  = p.zCL;
     zESO = p.zESO;
 
+
+    % Discrete state-feedback gains
+    p.k1 = (1 - p.zCL)^2 / Ts^2;
+    
+    p.k2 = (4 - (1 + p.zCL)^2) / (2*Ts);
+    
     common = (1 + zCL)^2 * (1 + zESO)^3;
     scale  = 1 / (b0 * Ts^2);
 
