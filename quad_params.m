@@ -50,7 +50,7 @@ adrc.yaw   = makeADRC(5,   8,  1/Izz);
 % Discrete-time ADRC
 adrcD.z     = makeADRC_D(5,   5,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.y     = makeADRC_D(2,   10, 1/W,   Ts);
+adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.roll  = makeADRC_D(25,  3,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(25,  3,  1/Iyy, Ts);
 adrcD.yaw   = makeADRC_D(5,   8,  1/Izz, Ts);
