@@ -41,14 +41,15 @@ inertia_mx = [Ixx; Iyy; Izz;];
 
 % Altitude
 wc_z = 5;          % rad/s
-wo_z = 5*wc_z;    % rad/s
+k_eso_z = 5;
+wo_z = k_eso_z*wc_z;    % rad/s
 b0_z = 1;     % Physical thrust input [N], nominal gain [1/kg]
 beta1_z = 3*wo_z;
 beta2_z = 3*wo_z^2;
 beta3_z = wo_z^3;
 
 % X Position
-wc_x = 2;            % rad/s
+wc_x = 1.5;            % rad/s
 wo_x = 10*wc_x;        % rad/s
 b0_x = 1/W;       % Virtual horizontal acceleration input [m/s^2]
 beta1_x = 3*wo_x;
@@ -56,12 +57,12 @@ beta2_x = 3*wo_x^2;
 beta3_x = wo_x^3;
 
 % Y Position
-wc_y = 2;            % rad/s
+wc_y = 1.5;            % rad/s
 wo_y = 10*wc_y;        % rad/s
 b0_y = 1/W;       % Virtual horizontal acceleration input [m/s^2]
 beta1_y = 3*wo_y;
-beta2_y = 3*wo_y^2/2;
-beta3_y = wo_y^3/2;
+beta2_y = 3*wo_y^2;
+beta3_y = wo_y^3;
 
 % Roll
 wc_roll = 25;         % rad/s

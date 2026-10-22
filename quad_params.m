@@ -39,53 +39,21 @@ Izz = 0.0228;
 
 inertia_mx = [Ixx; Iyy; Izz;];
 
-% Altitude
-wc_z = 5;          % rad/s
-wo_z = 5*wc_z;    % rad/s
-b0_z = 1;     % Physical thrust input [N], nominal gain [1/kg]
-beta1_z = 3*wo_z;
-beta2_z = 3*wo_z^2;
-beta3_z = wo_z^3;
+% Continuous-time ADRC
+adrc.z     = makeADRC(5,   5,  1);
+adrc.x     = makeADRC(1.5, 10, 1/W);
+adrc.y     = makeADRC(1.5, 10, 1/W);
+adrc.roll  = makeADRC(25,  3,  1/Ixx);
+adrc.pitch = makeADRC(25,  3,  1/Iyy);
+adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
-% X Position
-wc_x = 1.5;            % rad/s
-wo_x = 10*wc_x;        % rad/s
-b0_x = 1/W;       % Virtual horizontal acceleration input [m/s^2]
-beta1_x = 3*wo_x;
-beta2_x = 3*wo_x^2;
-beta3_x = wo_x^3;
-
-% Y Position
-wc_y = 1.5;            % rad/s
-wo_y = 10*wc_y;        % rad/s
-b0_y = 1/W;       % Virtual horizontal acceleration input [m/s^2]
-beta1_y = 3*wo_y;
-beta2_y = 3*wo_y^2;
-beta3_y = wo_y^3;
-
-% Roll
-wc_roll = 25;         % rad/s
-wo_roll = 3*wc_roll;  % rad/s
-b0_roll = 1/Ixx;
-beta1_roll = 3*wo_roll;
-beta2_roll = 3*wo_roll^2;
-beta3_roll = wo_roll^3;
-
-% Pitch
-wc_pitch = 25;          % rad/s
-wo_pitch = 3*wc_pitch;  % rad/s
-b0_pitch = 1/Iyy;
-beta1_pitch = 3*wo_pitch;
-beta2_pitch = 3*wo_pitch^2;
-beta3_pitch = wo_pitch^3;
-
-% Yaw
-wc_yaw = 5;          % rad/s
-wo_yaw = 8*wc_yaw;    % rad/s
-b0_yaw = 1/Izz;
-beta1_yaw = 3*wo_yaw;
-beta2_yaw = 3*wo_yaw^2;
-beta3_yaw = wo_yaw^3;
+% Discrete-time ADRC
+adrcD.z     = makeADRC_D(5,   5,  1,     Ts);
+adrcD.x     = makeADRC_D(1.5, 10, 1/W,   Ts);
+adrcD.y     = makeADRC_D(1.5, 10, 1/W,   Ts);
+adrcD.roll  = makeADRC_D(25,  3,  1/Ixx, Ts);
+adrcD.pitch = makeADRC_D(25,  3,  1/Iyy, Ts);
+adrcD.yaw   = makeADRC_D(5,   8,  1/Izz, Ts);
 
 r0_position = 3;
 h0 = Ts;
