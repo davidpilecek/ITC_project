@@ -48,7 +48,7 @@ beta2_z = 3*wo_z^2;
 beta3_z = wo_z^3;
 
 % X Position
-wc_x = 2;            % rad/s
+wc_x = 1.5;            % rad/s
 wo_x = 10*wc_x;        % rad/s
 b0_x = 1/W;       % Virtual horizontal acceleration input [m/s^2]
 beta1_x = 3*wo_x;
@@ -56,7 +56,7 @@ beta2_x = 3*wo_x^2;
 beta3_x = wo_x^3;
 
 % Y Position
-wc_y = 2;            % rad/s
+wc_y = 1.5;            % rad/s
 wo_y = 10*wc_y;        % rad/s
 b0_y = 1/W;       % Virtual horizontal acceleration input [m/s^2]
 beta1_y = 3*wo_y;
