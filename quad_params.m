@@ -2,10 +2,13 @@
 clc;clear;
 
 %%
+
+Ts = 0.001;
+
 h = 0.20;               % Hull height [m]
 
-L = 0.20;               % Hull length [m]
-Width = 0.08;           % Hull width [m]
+L = 0.30;               % Hull length [m]
+Width = 0.12;           % Hull width [m]
 Area = 2*L*Width;       % Total hull platform area
 
 g = 9.81;               % Gravity 
@@ -19,7 +22,7 @@ Fb_max = rho_water*g*V_max;
 Trot = 0.01;
 
 m_prop = 0.01;
-W = 1.30 + 4*m_prop;
+W = 1.50 + 4*m_prop;
 
 Fg = W*g;               % Gravity force
 
@@ -30,8 +33,6 @@ init_h = 0.03;
 end_h = 0.03;
 
 U_max = 4*17;
-
-Ts = 0.01;
 
 Ixx = 0.0118;
 Iyy = 0.0118;
@@ -47,13 +48,13 @@ adrc.roll  = makeADRC(25,  3,  1/Ixx);
 adrc.pitch = makeADRC(25,  3,  1/Iyy);
 adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
-% Discrete-time ADRC
+% Discrete-time ADRC, wc, kESO, b0
 adrcD.z     = makeADRC_D(5,   5,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.roll  = makeADRC_D(25,  3,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(25,  3,  1/Iyy, Ts);
-adrcD.yaw   = makeADRC_D(5,   8,  1/Izz, Ts);
+adrcD.yaw   = makeADRC_D(5,   8,  1000,  Ts);
 
 r0_position = 3;
 h0 = Ts;
@@ -69,7 +70,6 @@ Alloc = [ kf,     kf,     kf,     kf;
           km,    -km,     km,    -km ]
 
 K_alloc = Alloc \ diag([W, 1, 1, 1])
-
 
 %
 % Trajectory parameters

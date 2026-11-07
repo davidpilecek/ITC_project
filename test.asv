@@ -1,0 +1,13 @@
+T = readtable('RUN0001.csv','HeaderLines',0,'ReadVariableNames',true);
+
+throttle = T.dshot_command;
+rpm = T.shaft_rpm;
+
+throttle = rescale(throttle, )
+
+
+figure
+plot(throttle);
+hold on
+plot(rpm)
+grid on;

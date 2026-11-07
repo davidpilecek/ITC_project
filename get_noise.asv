@@ -1,0 +1,193 @@
+clc;clear;
+% TOF0 = readtable('data/TOF0000.csv','HeaderLines',0,'ReadVariableNames',true);
+TOF1 = readtable('data/TOF0001.csv','HeaderLines',0,'ReadVariableNames',true);
+% TOF2 = readtable('data/TOF0002.csv','HeaderLines',0,'ReadVariableNames',true);
+TOF3 = readtable('data/TOF0003.csv','HeaderLines',0,'ReadVariableNames',true);
+
+IMU1 = readtable('data/imu1.csv','HeaderLines',0,'ReadVariableNames',true);
+IMU2 = readtable('data/imu2.csv','HeaderLines',0,'ReadVariableNames',true);
+IMU3 = readtable('data/imu3.csv','HeaderLines',0,'ReadVariableNames',true);
+IMU4 = readtable('data/imu4.csv','HeaderLines',0,'ReadVariableNames',true);
+IMU5 = readtable('data/imu5.csv','HeaderLines',0,'ReadVariableNames',true);
+
+%%
+
+figure
+% plot(IMU1.yaw_deg);
+% hold on
+% plot(IMU4.yaw_deg);
+% hold on
+plot(IMU5.yaw_deg);
+
+[pxx,f] = pwelch(IMU5.roll_deg,[], [], [],Fs);
+figure
+plot(gx_dps)
+hold on
+
+plot(ax_g)
+
+[pxx,f] = pwelch(gz_dps,[], [], [],Fs);
+figure
+plot(f,pow2db(pxx))
+
+%%
+close all
+Ts = 0.001;
+Fs = 1/Ts;
+
+
+time = IMU5.elapsed_s;
+
+
+figure
+plot(time, IMU5.roll_deg)
+figure
+plot(time, IMU5.pitch_deg)
+figure
+plot(time, IMU5.gz_dps)
+
+
+roll_deg = IMU5.roll_deg - mean(IMU5.roll_deg);
+
+pitch_deg = IMU5.pitch_deg - mean(IMU5.pitch_deg);
+
+yaw_rate = IMU5.gz_dps - mean(IMU5.gz_dps);
+
+
+figure
+plot(time,roll_deg)
+figure
+plot(time,pitch_deg)
+figure
+plot(time,yaw_rate)
+
+power_roll = mean(roll_deg .^2)
+power_pitch = mean(pitch_deg .^2)
+power_yawrate = mean(yaw_rate .^2)
+
+%%
+time2 = IMU2.elapsed_s;
+ax_g2 = IMU2.ax_g - mean(IMU2.ax_g);
+ay_g2 = IMU2.ay_g - mean(IMU2.ay_g);
+az_g2 = IMU2.az_g - mean(IMU2.az_g);
+
+gx_dps2 = IMU2.gx_dps - mean(IMU2.gx_dps);
+gy_dps2 = IMU2.gy_dps - mean(IMU2.gy_dps);
+gz_dps2 = IMU2.gz_dps - mean(IMU2.gz_dps);
+
+% [pxx2,f2] = pwelch(gy_dps2,[], [], [],1000);
+[pxx2,f2] = pwelch(az_g2,[], [], [],1000);
+
+figure
+plot(f2,pxx2)
+mean(pxx2)
+xlabel("Frequency (Hz)")
+ylabel("PSD")
+
+%%
+Fs = 100;
+
+time = IMU1.elapsed_s;
+ax_g = IMU1.ax_g - mean(IMU1.ax_g);
+ay_g = IMU1.ay_g - mean(IMU1.ay_g);
+az_g = IMU1.az_g - mean(IMU1.az_g);
+
+gx_dps = IMU1.gx_dps - mean(IMU1.gx_dps);
+gy_dps = IMU1.gy_dps - mean(IMU1.gy_dps);
+gz_dps = IMU1.gz_dps - mean(IMU1.gz_dps);
+
+noisePower_accel1 = mean(ax_g.^2)
+noisePower_accel2 = mean(ay_g.^2)
+noisePower_accel3 = mean(az_g.^2)
+
+noisePower_gyro1 = mean(gx_dps.^2)
+noisePower_gyro2 = mean(gy_dps.^2)
+noisePower_gyro3 = mean(gz_dps.^2)
+
+xlabel("Frequency (Hz)")
+ylabel("PSD (dB/Hz)")
+
+%%
+figure;
+plot(time, gx_dps);
+
+figure;
+plot(time, gy_dps);
+
+figure;
+plot(time, gz_dps);
+
+%%
+figure
+plot(time, IMU1{:, ["ax_g", "ay_g", "az_g"]})
+xlabel("Time [s]")
+ylabel("Accel [g]")
+legend("X", "Y", "Z")
+grid on
+
+
+%%
+
+Fs_tof = 50;
+
+TOF = TOF3;
+
+timestamp_start = TOF.timestamp_us(1);
+timestamp_end = TOF.timestamp_us(end);
+
+time_us = TOF.timestamp_us - timestamp_start;
+time_s = time_us/10^6;
+
+distance_var = TOF.distance_mm - mean(TOF.distance_mm);  % remove mean
+distance_var = distance_var/1000; % cvt to m
+noisePower = mean(distance_var.^2) % noisePower = 2.6540e-06, Fs = 50 Hz;
+
+% noise_power = rssq(distance_var(:))^2
+% 
+% [pxx,f] = pwelch(distance_var,[], [], [],Fs_tof);
+% figure
+% plot(f,pxx)
+
+
+
+figure
+plot(time_s, distance_var)
+xlabel("Time [us]")
+ylabel("ditance [mm]")
+% legend("X", "Y", "Z")
+grid on
+
+
+
+%%
+figure
+plot(time, IMU1{:, ["gx_dps", "gy_dps", "gz_dps"]})
+xlabel("Time [s]")
+ylabel("Rates [gs]")
+legend("X", "Y", "Z")
+grid on
+
+
+
+%%
+figure
+plot(time, IMU1{:, ["roll_deg", "pitch_deg", "yaw_deg"]})
+xlabel("Time [s]")
+ylabel("Angles [gss]")
+legend("roll", "pitch", "yaw")
+grid on
+
+
+
+% 
+% throttle = T.dshot_command;
+% rpm = T.shaft_rpm;
+% time = T.time_s;
+% 
+% throttle = rescale(throttle, 0, max(rpm));
+% 
+% figure
+% plot(time, throttle);
+% hold on
+% plot(time, rpm);
+% grid on;
