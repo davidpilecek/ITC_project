@@ -1,4 +1,4 @@
-clc;clear;
+% clc;clear;
 % TOF0 = readtable('data/TOF0000.csv','HeaderLines',0,'ReadVariableNames',true);
 TOF1 = readtable('data/TOF0001.csv','HeaderLines',0,'ReadVariableNames',true);
 % TOF2 = readtable('data/TOF0002.csv','HeaderLines',0,'ReadVariableNames',true);
@@ -140,11 +140,9 @@ noisePower = mean(distance_var.^2) % noisePower = 2.6540e-06, Fs = 50 Hz;
 
 % noise_power = rssq(distance_var(:))^2
 % 
-% [pxx,f] = pwelch(distance_var,[], [], [],Fs_tof);
-% figure
-% plot(f,pxx)
-
-
+[pxx,f] = pwelch(distance_var,[], [], [],Fs_tof);
+figure
+plot(f,pxx)
 
 figure
 plot(time_s, distance_var)

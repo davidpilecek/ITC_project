@@ -2,7 +2,6 @@
 clc;clear;
 
 %%
-
 Ts = 0.001;
 
 h = 0.20;               % Hull height [m]
@@ -49,14 +48,14 @@ adrc.pitch = makeADRC(25,  3,  1/Iyy);
 adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
 % Discrete-time ADRC, wc, kESO, b0
-adrcD.z     = makeADRC_D(5,   5,  1,     Ts);
+adrcD.z     = makeADRC_D(7,   3,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.roll  = makeADRC_D(25,  3,  1/Ixx, Ts);
-adrcD.pitch = makeADRC_D(25,  3,  1/Iyy, Ts);
-adrcD.yaw   = makeADRC_D(5,   8,  1000,  Ts);
+adrcD.roll  = makeADRC_D(20,  3,  1/Ixx, Ts);
+adrcD.pitch = makeADRC_D(15,  2.5,  1/Iyy, Ts);
+adrcD.yaw   = makeADRC_D(10,  3,  1000,  Ts);
 
-r0_position = 3;
+r0_position = 1;
 h0 = Ts;
 
 arm_L = 0.3;
