@@ -60,10 +60,8 @@ h0 = Ts;
 
 arm_L = 0.3;
 
-km = 2e-7;
-kf = 2.87976e-05;
-
-
+km = 2.3077e-08;
+kf = 1.5715e-06;
 
 Alloc = [ kf,     kf,     kf,     kf;
           0,  -kf*arm_L,      0,   kf*arm_L;

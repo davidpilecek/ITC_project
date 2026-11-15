@@ -1,50 +1,69 @@
 clc;clear;close all;
 
-% only log4 has optical RPM 
+rc = readtable('d3/log2.csv','HeaderLines',0,'ReadVariableNames',true);
+sd = readtable('d3/RL0020.csv','HeaderLines',0,'ReadVariableNames',true);
 
-rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
-sd = readtable('d2/RL0019.csv','HeaderLines',0,'ReadVariableNames',true);
+rc(1:225,:) = [];
+rc(end - 439:end,:) = [];
 
+sd(1:66,:) = [];
+sd(end - 25:end,:) = [];
 
-plot(rc.RightLoadCell_mV_ - mean(rc.RightLoadCell_mV_))
+rpm = sd.rl_erpm / 7;
+rpm = rpm * 2 * pi / 60;
+eRPM_2 = rpm .^ 2;
+
+time = rc.Time_s_;
+T = -rc.Torque_N_m_(:);
+
+% T = T - mean(T);
+
+Fs = 20;                        % desired sample rate [Hz]
+time = time(:);
+T = T(:);
+
+[time, idx] = sort(time);
+T = T(idx);           % keep measurements paired with timestamps
+
+t = time;
+
+t_uniform = (t(1):1/Fs:t(end)).';
+torq_uniform = interp1(t, T, t_uniform, 'linear');
+
+plot(torq_uniform)
+hold on
+
+plot(rpm)
+
+%%
+
+% Fit a quadratic thrust model from optical RPM squared
+valid = isfinite(eRPM_2) & isfinite(torq_uniform);
+torqueModel = polyfit(eRPM_2(valid), torq_uniform(valid), 1)
+torquePredicted = polyval(torqueModel, eRPM_2);
+
+display(torqueModel(1))
+
 figure
-plot(rc.LeftLoadCell_mV_ - mean(rc.LeftLoadCell_mV_))
+plot(eRPM_2(valid), torq_uniform(valid), '.', 'DisplayName', 'Measured')
+hold on
+plot(eRPM_2(valid), torquePredicted(valid), 'LineWidth', 1.5, ...
+    'DisplayName', 'Linear fit')
+xlabel('Optical RPM^2')
+ylabel('Torque [-]')
+legend('Location', 'best')
+grid on
 
-
-L = rc.LeftLoadCell_mV_(:);
-R = rc.RightLoadCell_mV_(:);
-T = rc.Torque_N_m_(:);
-
-% Remove unloaded offsets (first 100 samples)
-L = L - mean(L(1:100));
-R = R - mean(R(1:100));
-T = T - mean(T(1:100));
-
-% Calculate common and differential signals
-common = (L + R)/2;
-differential = (L - R)/2;
-
-figure;
-
-subplot(3,1,1)
-plot(L); hold on; plot(R);
-legend('Left','Right');
-title('Individual load cells');
-grid on;
-
-subplot(3,1,2)
-plot(common); hold on;
-plot(differential);
-legend('Common mode','Differential mode');
-title('Combined signals (raw units)');
-grid on;
-
-subplot(3,1,3)
-plot(T);
-title('RCbenchmark calculated torque');
-xlabel('Sample number');
-grid on;
-
+% Compare measured thrust with the fitted optical-RPM model
+figure
+plot(t_uniform, torq_uniform, 'DisplayName', 'Measured thrust')
+hold on
+plot(t_uniform, torquePredicted, 'LineWidth', 1.5, ...
+    'DisplayName', 'Model prediction')
+xlabel('Time [s]')
+ylabel('Torque [-]')
+legend('Location', 'best')
+grid on
 
 %%
 clc;clear;close all;
@@ -59,7 +78,9 @@ rc(end - 300:end,:) = [];
 
 sd(end - 4:end,:) = [];
 
-erpm = sd.rl_erpm/7;
+rpm = sd.rl_erpm / 7;
+rpm = rpm * 2 * pi / 60;
+eRPM_2 = rpm .^ 2;
 
 thrust = -rc.Thrust_kgf_;
 
@@ -75,22 +96,10 @@ thrust = thrust(idx);           % keep measurements paired with timestamps
 t = time;
 x = thrust;
 y = rc.MotorOpticalSpeed_RPM_;
-torque = rc.Torque_N_m_;
-
 
 t_uniform = (t(1):1/Fs:t(end)).';
 x_uniform = interp1(t, x, t_uniform, 'linear');
 y_uniform = interp1(t, y, t_uniform, 'linear');
-torq_uniform = interp1(t, torque, t_uniform, 'linear');
-
-% x_uniform = x_uniform * max(y_uniform);
-
-torq_uniform = torq_uniform * max(x_uniform) / max(torq_uniform) / 2;
-
-plot(t_uniform, torq_uniform)
-hold on
-plot(t_uniform, x_uniform)
-
 
 figure
 plot(t_uniform, x_uniform)
@@ -98,7 +107,7 @@ hold on
 plot(t_uniform, y_uniform)
 
 figure
-plot(t_uniform, erpm)
+plot(t_uniform, rpm)
 hold on
 plot(t_uniform, y_uniform)
 
@@ -106,13 +115,14 @@ legend( "eRPM", "Optical RPM")
 
 %%
 
-
-eRPM_2 = y_uniform .^ 2;
+% eRPM_2 = y_uniform .^ 2;
 
 % Fit a quadratic thrust model from optical RPM squared
 valid = isfinite(eRPM_2) & isfinite(x_uniform);
 thrustModel = polyfit(eRPM_2(valid), x_uniform(valid), 1);
 thrustPredicted = polyval(thrustModel, eRPM_2);
+
+kf = thrustModel(1) * 9.80665
 
 figure
 plot(eRPM_2(valid), x_uniform(valid), '.', 'DisplayName', 'Measured')
@@ -150,9 +160,6 @@ clc;clear;close all;
 
 rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
 sd = readtable('d2/RL0019.csv','HeaderLines',0,'ReadVariableNames',true);
-
-
-
 
 %%
 % bench 2 and 3 with RL0006
