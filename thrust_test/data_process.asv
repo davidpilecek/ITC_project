@@ -1,18 +1,52 @@
 clc;clear;close all;
 
-rc = readtable('d3/log2.csv','HeaderLines',0,'ReadVariableNames',true);
+max_rad_s = 2428;
+
+Vn = 14.8;
+Kf = 1.5715e-06;
+g = 9.81;
+
+Tmax = (max_rad_s)^2 * Kf / g
+
+m_prop = 0.01;
+W = 1.34 + 4*m_prop;
+
+4*Tmax / W
+
+Tmax = (Vn * max_rad_s)^2 * Kf / g;
+
+
+
+%%
+rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
+
+plot(rc.Thrust_kgf_)
+figure
+plot(rc.MotorOpticalSpeed_RPM_)
+
 sd = readtable('d3/RL0020.csv','HeaderLines',0,'ReadVariableNames',true);
 
+%%
 rc(1:225,:) = [];
 rc(end - 439:end,:) = [];
 
 sd(1:66,:) = [];
 sd(end - 25:end,:) = [];
+%%
+
+% sd = readtable('d3/RL0020.csv','HeaderLines',0,'ReadVariableNames',true);
 
 rpm = sd.rl_erpm / 7;
-rpm = rpm * 2 * pi / 60;
-eRPM_2 = rpm .^ 2;
+rpm = rpm * 2 * pi / 60; % conversion from RPM to rad/sec
 
+
+figure
+plot(rpm)
+figure
+eRPM_2 = rpm .^ 2;       % conversion to rad/sec ^2
+
+
+%%
 time = rc.Time_s_;
 T = -rc.Torque_N_m_(:);
 
@@ -37,7 +71,10 @@ plot(rpm)
 
 %%
 
-% Fit a quadratic thrust model from optical RPM squared
+
+
+%%
+
 valid = isfinite(eRPM_2) & isfinite(torq_uniform);
 torqueModel = polyfit(eRPM_2(valid), torq_uniform(valid), 1)
 torquePredicted = polyval(torqueModel, eRPM_2);
@@ -79,10 +116,24 @@ rc(end - 300:end,:) = [];
 sd(end - 4:end,:) = [];
 
 rpm = sd.rl_erpm / 7;
-rpm = rpm * 2 * pi / 60;
-eRPM_2 = rpm .^ 2;
+omega = rpm * 2 * pi / 60;
 
 thrust = -rc.Thrust_kgf_;
+
+omega = omega(:);
+thrust = thrust(:);
+
+% Detect outliers using a moving median
+window = 21;  % Number of neighboring samples
+
+outliers = isoutlier(thrust, 'movmedian', window);
+
+% Remove outliers from BOTH vectors
+omega_clean = omega(~outliers);
+thrust_clean = thrust(~outliers);
+thrust = thrust_clean;
+
+eRPM_2 = omega_clean .^ 2;
 
 time = rc.Time_s_ - rc.Time_s_(1);
 
@@ -103,24 +154,32 @@ y_uniform = interp1(t, y, t_uniform, 'linear');
 
 figure
 plot(t_uniform, x_uniform)
-hold on
-plot(t_uniform, y_uniform)
+% hold on
+% plot(t_uniform, y_uniform)
 
 figure
-plot(t_uniform, erpm)
+plot(t_uniform, rpm)
 hold on
 plot(t_uniform, y_uniform)
-
 legend( "eRPM", "Optical RPM")
 
-%%
 
-eRPM_2 = y_uniform .^ 2;
+% Plot cleaned data
+itcPlot(omega_clean, thrust_clean, [], ...
+    "thrust_vs_omega_clean", ...
+    XLabel="Angular velocity (rad/s)", ...
+    YLabel="Thrust (kgf)");
+
+
+
+%%
 
 % Fit a quadratic thrust model from optical RPM squared
 valid = isfinite(eRPM_2) & isfinite(x_uniform);
 thrustModel = polyfit(eRPM_2(valid), x_uniform(valid), 1);
 thrustPredicted = polyval(thrustModel, eRPM_2);
+
+kf = thrustModel(1) * 9.81
 
 figure
 plot(eRPM_2(valid), x_uniform(valid), '.', 'DisplayName', 'Measured')
@@ -158,9 +217,6 @@ clc;clear;close all;
 
 rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
 sd = readtable('d2/RL0019.csv','HeaderLines',0,'ReadVariableNames',true);
-
-
-
 
 %%
 % bench 2 and 3 with RL0006

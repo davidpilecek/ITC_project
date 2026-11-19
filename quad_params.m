@@ -21,7 +21,7 @@ Fb_max = rho_water*g*V_max;
 Trot = 0.01;
 
 m_prop = 0.01;
-W = 1.50 + 4*m_prop;
+W = 1.34 + 4*m_prop;
 
 Fg = W*g;               % Gravity force
 
@@ -33,14 +33,14 @@ end_h = 0.03;
 
 U_max = 4*17;
 
-Ixx = 0.0118;
-Iyy = 0.0118;
-Izz = 0.0228;
+Ixx = 0.02448;
+Iyy = 0.01352;
+Izz = 0.03479;
 
 inertia_mx = [Ixx; Iyy; Izz;];
 
 % Continuous-time ADRC
-adrc.z     = makeADRC(5,   5,  1);
+adrc.z     = makeADRC(7,   3,  1);
 adrc.x     = makeADRC(1.5, 10, 1/W);
 adrc.y     = makeADRC(1.5, 10, 1/W);
 adrc.roll  = makeADRC(25,  3,  1/Ixx);
@@ -55,10 +55,13 @@ adrcD.roll  = makeADRC_D(20,  3,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(15,  2.5,  1/Iyy, Ts);
 adrcD.yaw   = makeADRC_D(10,  3,  1000,  Ts);
 
+
+RPM_Max =  867302500;
+
 r0_position = 1;
 h0 = Ts;
 
-arm_L = 0.3;
+arm_L = 0.328;
 
 km = 2.3077e-08;
 kf = 1.5715e-06;

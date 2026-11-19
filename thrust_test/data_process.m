@@ -1,18 +1,50 @@
 clc;clear;close all;
 
-rc = readtable('d3/log2.csv','HeaderLines',0,'ReadVariableNames',true);
+max_rad_s = 2428;
+
+Vn = 14.8;
+Kf = 1.5715e-06;
+g = 9.81;
+
+Tmax = (max_rad_s)^2 * Kf / g
+
+m_prop = 0.01;
+W = 1.34 + 4*m_prop;
+
+4*Tmax / W
+
+Tmax = (Vn * max_rad_s)^2 * Kf / g;
+
+%%
+rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
+
+plot(rc.Thrust_kgf_)
+figure
+plot(rc.MotorOpticalSpeed_RPM_)
+
 sd = readtable('d3/RL0020.csv','HeaderLines',0,'ReadVariableNames',true);
 
+%%
 rc(1:225,:) = [];
 rc(end - 439:end,:) = [];
 
 sd(1:66,:) = [];
 sd(end - 25:end,:) = [];
+%%
+
+% sd = readtable('d3/RL0020.csv','HeaderLines',0,'ReadVariableNames',true);
 
 rpm = sd.rl_erpm / 7;
-rpm = rpm * 2 * pi / 60;
-eRPM_2 = rpm .^ 2;
+rpm = rpm * 2 * pi / 60; % conversion from RPM to rad/sec
 
+
+figure
+plot(rpm)
+figure
+eRPM_2 = rpm .^ 2;       % conversion to rad/sec ^2
+
+
+%%
 time = rc.Time_s_;
 T = -rc.Torque_N_m_(:);
 
@@ -37,7 +69,10 @@ plot(rpm)
 
 %%
 
-% Fit a quadratic thrust model from optical RPM squared
+
+
+%%
+
 valid = isfinite(eRPM_2) & isfinite(torq_uniform);
 torqueModel = polyfit(eRPM_2(valid), torq_uniform(valid), 1)
 torquePredicted = polyval(torqueModel, eRPM_2);
@@ -66,63 +101,140 @@ legend('Location', 'best')
 grid on
 
 %%
-clc;clear;close all;
 
-% only log4 has optical RPM 
+clc; clear; close all;
 
-rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
-sd = readtable('d2/RL0019.csv','HeaderLines',0,'ReadVariableNames',true);
+%% Configuration
+Fs = 20;                   % Resampling frequency [Hz]
+outlierWindow = 21;        % Moving median window [samples]
+motorPoles = 7;            % ESC eRPM / mechanical RPM divisor
 
-rc(1:750,:) = [];
-rc(end - 300:end,:) = [];
+%% Load data
+rc = readtable('d2/log4.csv');
+sd = readtable('d2/RL0019.csv');
 
-sd(end - 4:end,:) = [];
+% Trim measurements
+rc = rc(751:end-301, :);
+sd = sd(1:end-5, :);
 
-rpm = sd.rl_erpm / 7;
-rpm = rpm * 2 * pi / 60;
-eRPM_2 = rpm .^ 2;
-
+%% Extract signals
+% Tyto thrust stand
+t = rc.Time_s_;
 thrust = -rc.Thrust_kgf_;
+rpmOptical = rc.MotorOpticalSpeed_RPM_;
 
-time = rc.Time_s_ - rc.Time_s_(1);
+% ESC telemetry
+rpmESC = sd.rl_erpm / motorPoles;
 
-Fs = 20;                        % desired sample rate [Hz]
-time = time(:);
-thrust = thrust(:);
+%% Sort and resample
+% Ensure all signals remain aligned
+[t, idx] = sort(t);
 
-[time, idx] = sort(time);
-thrust = thrust(idx);           % keep measurements paired with timestamps
+thrust = thrust(idx);
+rpmOptical = rpmOptical(idx);
 
-t = time;
-x = thrust;
-y = rc.MotorOpticalSpeed_RPM_;
+% Remove duplicate timestamps
+[t, idx] = unique(t, 'stable');
+thrust = thrust(idx);
+rpmOptical = rpmOptical(idx);
 
-t_uniform = (t(1):1/Fs:t(end)).';
-x_uniform = interp1(t, x, t_uniform, 'linear');
-y_uniform = interp1(t, y, t_uniform, 'linear');
+% Uniform time vector
+tUniform = (t(1):1/Fs:t(end)).';
 
-figure
-plot(t_uniform, x_uniform)
-hold on
-plot(t_uniform, y_uniform)
+% Interpolate signals
+thrustUniform = interp1(t, thrust, tUniform, 'linear');
+rpmOpticalUniform = interp1(t, rpmOptical, tUniform, 'linear');
 
-figure
-plot(t_uniform, rpm)
-hold on
-plot(t_uniform, y_uniform)
+rpm = rpmOpticalUniform;
 
-legend( "eRPM", "Optical RPM")
+fprintf('Total samples: %d\n', numel(rpm));
+fprintf('Unique RPM values: %d\n', numel(unique(rpm)));
+fprintf('Duplicate values: %d\n', numel(rpm) - numel(unique(rpm)));
 
 %%
+figure;
+scatter(omegaClean, thrustClean, 5, 'filled');
+xlabel('Angular velocity (rad/s)');
+ylabel('Thrust (kgf)');
+grid on;
 
-% eRPM_2 = y_uniform .^ 2;
+%% Detect invalid RPM measurements
+
+% Identify unusually large deviations from local median
+rpmOutliers = isoutlier(rpmESC, ...
+    'movmedian', 21, 'ThresholdFactor', 3);
+
+% Remove samples with invalid RPM readings
+valid = ~rpmOutliers & ...
+        isfinite(rpmOpticalUniform) & ...
+        isfinite(thrustUniform);
+
+rpmClean = rpmESC(valid);
+thrustClean = thrustUniform(valid);
+
+omegaClean = rpmClean * 2*pi/60;
+
+fprintf('Removed %d samples\n', nnz(~valid));
+
+%% Plot cleaned data
+makePlot(omegaClean, thrustClean, [], ...
+    "thrust_vs_omega_clean", ...
+    XLabel="Angular velocity (rad/s)", ...
+    YLabel="Thrust (kgf)", ...
+    PlotTypes="scatter");
+
+
+
+%%
+figure;
+plot(tUniform, rpmOpticalUniform);
+xlabel('Time (s)');
+ylabel('Optical RPM');
+grid on;
+
+%% Plot 1: Thrust vs. time
+figure;
+plot(tUniform, thrustUniform);
+xlabel('Time (s)');
+ylabel('Thrust (kgf)');
+grid on;
+
+%% Plot 2: ESC vs. optical RPM
+% Assumes the ESC and Tyto logs have already been synchronized.
+figure;
+plot(tUniform, rpmESC);
+hold on;
+plot(tUniform, rpmOpticalUniform);
+xlabel('Time (s)');
+ylabel('Rotor speed (rpm)');
+legend('ESC RPM', 'Optical RPM');
+grid on;
+
+%% Plot 3: Thrust vs. angular velocity
+makePlot(omegaClean, thrustClean, [], ...
+    "thrust_vs_omega_clean", ...
+    XLabel="Angular velocity (rad/s)", ...
+    YLabel="Thrust (kgf)");
+
+%% Optional: Prepare data for system identification
+omegaSquared = omegaClean.^2;
+thrustN = thrustClean * 9.80665;
+
+% Fit F = kf * omega^2, constrained through origin
+kf = omegaSquared \ thrustN;
+
+fprintf('Estimated kf: %.6e N/(rad/s)^2\n', kf);
+fprintf('Removed %d outliers\n', nnz(outliers));
+
+
+%%
 
 % Fit a quadratic thrust model from optical RPM squared
 valid = isfinite(eRPM_2) & isfinite(x_uniform);
 thrustModel = polyfit(eRPM_2(valid), x_uniform(valid), 1);
 thrustPredicted = polyval(thrustModel, eRPM_2);
 
-kf = thrustModel(1) * 9.80665
+kf = thrustModel(1) * 9.81
 
 figure
 plot(eRPM_2(valid), x_uniform(valid), '.', 'DisplayName', 'Measured')
