@@ -1,19 +1,18 @@
 clc;clear;close all;
 
-max_rad_s = 2428;
+max_RPM = 138284 / 7;
 
-Vn = 14.8;
+max_rad_s = max_RPM * 2 * pi / 60;
+
 Kf = 1.5715e-06;
 g = 9.81;
 
-Tmax = (max_rad_s)^2 * Kf / g
+Tmax = (max_rad_s)^2 * Kf / g;
 
 m_prop = 0.01;
 W = 1.34 + 4*m_prop;
 
 4*Tmax / W
-
-Tmax = (Vn * max_rad_s)^2 * Kf / g;
 
 %%
 rc = readtable('d2/log4.csv','HeaderLines',0,'ReadVariableNames',true);
