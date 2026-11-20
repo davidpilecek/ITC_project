@@ -31,7 +31,7 @@ z_float = h/2 - c_float;
 init_h = 0.03;
 end_h = 0.03;
 
-U_max = 4*17;
+% U_max = 4*17;
 
 Ixx = 0.02448;
 Iyy = 0.01352;
@@ -40,11 +40,11 @@ Izz = 0.03479;
 inertia_mx = [Ixx; Iyy; Izz;];
 
 % Continuous-time ADRC
-adrc.z     = makeADRC(7,   5,  1);
+adrc.z     = makeADRC(6,   3,  1);
 adrc.x     = makeADRC(1.5, 10, 1/W);
 adrc.y     = makeADRC(1.5, 10, 1/W);
-adrc.roll  = makeADRC(25,  3,  1/Ixx);
-adrc.pitch = makeADRC(25,  3,  1/Iyy);
+adrc.roll  = makeADRC(15,  2.5,  1/Ixx);
+adrc.pitch = makeADRC(15,  2.5,  1/Iyy);
 adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
 % Discrete-time ADRC, wc, kESO, b0
@@ -55,9 +55,10 @@ adrcD.roll  = makeADRC_D(20,  3,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(15,  2.5,  1/Iyy, Ts);
 adrcD.yaw   = makeADRC_D(5,  3,  1000,  Ts);
 
+max_RPM = 138284 / 7;
 
-RPM_Max =  867302500;
-
+max_rad_s = max_RPM * 2 * pi / 60;
+max_rad_s_2 = max_rad_s ^ 2;
 
 r0_position = 1;
 h0 = Ts;
@@ -67,6 +68,8 @@ arm_L = 0.350;
 km = 2.3077e-08;
 kf = 1.5715e-06;
 
+max_thrust = max_rad_s_2 * kf * 4;
+
 Alloc = [ kf,     kf,     kf,     kf;
           0,  -kf*arm_L,      0,   kf*arm_L;
         -kf*arm_L,      0,   kf*arm_L,      0;
@@ -74,9 +77,9 @@ Alloc = [ kf,     kf,     kf,     kf;
 
 K_alloc = Alloc \ diag([W, 1, 1, 1]);
 
-max_thrust = RPM_Max * kf;
 
-%
+
+%%
 % Trajectory parameters
 altitude = 3;       % m
 Ax = 2;             % X amplitude (m)
