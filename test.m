@@ -1,3 +1,22 @@
+
+
+discrete_u = load("discrete_u.mat").ans;
+discrete_z = load("discrete_z.mat").ans;
+
+
+
+plot(out.cont_u)
+hold on
+stairs(discrete_u.Time, discrete_u.Data)
+
+figure
+
+plot(out.cont_z)
+hold on
+stairs(discrete_z.Time, discrete_z.Data)
+
+%%
+
 T = readtable('RUN0005.csv','HeaderLines',0,'ReadVariableNames',true);
 
 throttle = T.dshot_command;

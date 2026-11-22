@@ -40,7 +40,7 @@ Izz = 0.03479;
 inertia_mx = [Ixx; Iyy; Izz;];
 
 % Continuous-time ADRC
-adrc.z     = makeADRC(6,   3,  1);
+adrc.z     = makeADRC(7,   3,  1);
 adrc.x     = makeADRC(1.5, 10, 1/W);
 adrc.y     = makeADRC(1.5, 10, 1/W);
 adrc.roll  = makeADRC(15,  2.5,  1/Ixx);
@@ -51,14 +51,16 @@ adrc.yaw   = makeADRC(5,   8,  1/Izz);
 adrcD.z     = makeADRC_D(7,   3,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.roll  = makeADRC_D(20,  3,  1/Ixx, Ts);
+adrcD.roll  = makeADRC_D(15,  2.5,  1/Ixx, Ts);
 adrcD.pitch = makeADRC_D(15,  2.5,  1/Iyy, Ts);
-adrcD.yaw   = makeADRC_D(5,  3,  1000,  Ts);
+adrcD.yaw   = makeADRC_D(8,  2,  1000,  Ts);
 
 max_RPM = 138284 / 7;
 
 max_rad_s = max_RPM * 2 * pi / 60;
 max_rad_s_2 = max_rad_s ^ 2;
+
+RPM_Max = max_rad_s_2;
 
 r0_position = 1;
 h0 = Ts;
@@ -76,8 +78,6 @@ Alloc = [ kf,     kf,     kf,     kf;
           km,    -km,     km,    -km ];
 
 K_alloc = Alloc \ diag([W, 1, 1, 1]);
-
-
 
 %%
 % Trajectory parameters
