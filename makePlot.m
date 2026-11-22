@@ -31,7 +31,8 @@ arguments
     opts.LegendLocation (1,1) string = "best"
     opts.OutputDir (1,1) string = "figures"
     opts.SaveFig (1,1) logical = true
-    opts.PlotTypes (1,1) string = "line"
+    opts.PlotTypes (1,:) string = "line"
+    opts.MarkerSize (1,1) double {mustBePositive} = 12
 end
 
 %% Normalize input data
@@ -91,7 +92,7 @@ end
 %% Project color palette
 colors = [
     0.000 0.447 0.698;  % Blue
-    0.835 0.369 0.000;  % Orange
+    0.9 0.1 0.000;  % Orange
     0.000 0.620 0.451;  % Green
     0.494 0.314 0.627;  % Purple
     0.350 0.350 0.350;  % Gray
@@ -111,33 +112,58 @@ ax = axes('Parent', fig);
 hold(ax, 'on');
 
 %% Plot signals
+
+%% Plot signals
+
+% Expand a single plot type to all datasets
+plotTypes = opts.PlotTypes;
+
+if isscalar(plotTypes)
+    plotTypes = repmat(plotTypes, 1, n);
+elseif numel(plotTypes) ~= n
+    error("PlotTypes must have one entry per dataset.");
+end
+
 for k = 1:n
     colorIndex = mod(k-1, size(colors,1)) + 1;
     styleIndex = mod(k-1, numel(styles)) + 1;
 
-    switch opts.PlotTypes
-        case "scatter"
-            scatter(ax, X{k}, Y{k}, 12, ...
-                colors(colorIndex,:), 'filled');
+    color = colors(colorIndex,:);
 
-        case "line+markers"
-            plot(ax, X{k}, Y{k}, ...
-                'Color', colors(colorIndex,:), ...
-                'LineStyle', styles{styleIndex}, ...
-                'LineWidth', 1.2, ...
-                'Marker', '.', ...
-                'MarkerSize', 7);
+    if plotTypes(1) == "scatter"
+        lineStyle = "-";
+    else
+        lineStyle = styles{styleIndex};
+    end
+
+
+    switch plotTypes(k)
+
+        case "scatter"
+            scatter(ax, X{k}, Y{k}, ...
+                opts.MarkerSize, color, ...
+                'filled', ...
+                'MarkerFaceAlpha', 0.85);
 
         case "line"
             plot(ax, X{k}, Y{k}, ...
-                'Color', colors(colorIndex,:), ...
-                'LineStyle', styles{styleIndex}, ...
+                'Color', color, ...
+                'LineStyle', lineStyle, ...
                 'LineWidth', 1.4);
 
+        case "line+markers"
+            plot(ax, X{k}, Y{k}, ...
+                'Color', color, ...
+                'LineStyle', styles{styleIndex}, ...
+                'LineWidth', 1.2, ...
+                'Marker', '.', ...
+                'MarkerSize', 8);
+
         otherwise
-            error("Unknown PlotTypes option: %s", opts.PlotTypes);
+            error("Unknown plot type: %s", plotTypes(k));
     end
 end
+
 
 %% Axes formatting
 set(ax, ...
