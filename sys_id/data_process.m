@@ -1,3 +1,40 @@
+%%
+clc;clear;close all;
+
+V0 = 0.304;
+V200 = 0.431;
+
+Vmax = -1.15;
+Vmin = -0.24;
+
+% kg_per_mV = 0.2/abs(V200 - V0);
+g_per_mV = 0.965;
+
+max_t =  abs(Vmax - Vmin) * g_per_mV
+
+max_rpm = 157086/7;
+max_rad_s = max_rpm * 2*pi /60;
+
+max_t_calc = 1.5715e-06 * max_rad_s ^ 2 / 9.81
+
+sd = readtable('d4/RL0028.CSV');
+rc = readtable('d4/log42.csv');
+
+figure
+plot(rc.LeftLoadCell_mV_)
+figure
+rpm = sd.rl_erpm/7;
+
+omega = rpm *2*pi /60;
+omega_2 = omega .^2;
+
+plot(omega)
+kf = 1.5715e-06;
+
+thrust = omega_2 * kf / 9.81;
+figure
+plot(thrust)
+
 %% Thrust data prep
 clc; clear; close all;
 
@@ -17,7 +54,6 @@ rc = rc(751:end-301, :);
 t = rc.Time_s_ - rc.Time_s_(1);
 thrust = -rc.Thrust_kgf_;
 thrust = thrust - thrust(1);
-
 rpmOptical = rc.MotorOpticalSpeed_RPM_;
 
 figure;
