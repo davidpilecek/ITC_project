@@ -13,7 +13,6 @@ t = (sd.time_ms - sd.time_ms(1)) / 1000;
 command = sd.rl_dshot - sd.rl_dshot(1);
 erpm = abs(sd.rl_erpm - sd.rl_erpm(1) );
 
-
 %%
 data = iddata(erpm(:), command(:), Ts);
 sys = tfest(data, 1, 0)

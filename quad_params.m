@@ -48,7 +48,7 @@ adrc.pitch = makeADRC(15,  2.5,  1/Iyy);
 adrc.yaw   = makeADRC(5,   8,  1/Izz);
 
 % Discrete-time ADRC, wc, kESO, b0
-adrcD.z     = makeADRC_D(7,   3,  1,     Ts);
+adrcD.z     = makeADRC_D(8,  2.5,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.roll  = makeADRC_D(15,  2.5,  1/Ixx, Ts);
