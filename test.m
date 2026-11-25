@@ -1,9 +1,5 @@
-
-
 discrete_u = load("discrete_u.mat").ans;
 discrete_z = load("discrete_z.mat").ans;
-
-
 
 plot(out.cont_u)
 hold on

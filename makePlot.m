@@ -33,6 +33,9 @@ arguments
     opts.SaveFig (1,1) logical = true
     opts.PlotTypes (1,:) string = "line"
     opts.MarkerSize (1,1) double {mustBePositive} = 12
+    opts.YAxis (1,:) string = "left"
+    opts.YLabelRight (1,1) string = ""
+    opts.YLimRight (1,2) double = [-inf inf]
 end
 
 %% Normalize input data
@@ -124,31 +127,50 @@ elseif numel(plotTypes) ~= n
     error("PlotTypes must have one entry per dataset.");
 end
 
+    % if plotTypes(1) == "scatter"
+    %     lineStyle = "-";
+    % else
+    %     lineStyle = styles{styleIndex};
+    % end
+
+% Expand axis assignment to all datasets
+yAxes = opts.YAxis;
+if isscalar(yAxes)
+    yAxes = repmat(yAxes, 1, n);
+end
+
+% Validate options
+if numel(plotTypes) ~= n || numel(yAxes) ~= n
+    error("PlotTypes and YAxis must have one entry per dataset.");
+end
+
+if ~all(ismember(yAxes, ["left", "right"]))
+    error('YAxis entries must be "left" or "right".');
+end
+
+useRightAxis = any(yAxes == "right");
+
+% Plot each signal on its assigned axis
 for k = 1:n
+    if useRightAxis
+        yyaxis(ax, char(yAxes(k)));
+    end
+
     colorIndex = mod(k-1, size(colors,1)) + 1;
     styleIndex = mod(k-1, numel(styles)) + 1;
 
     color = colors(colorIndex,:);
 
-    if plotTypes(1) == "scatter"
-        lineStyle = "-";
-    else
-        lineStyle = styles{styleIndex};
-    end
-
-
     switch plotTypes(k)
-
         case "scatter"
             scatter(ax, X{k}, Y{k}, ...
                 opts.MarkerSize, color, ...
-                'filled', ...
-                'MarkerFaceAlpha', 0.85);
+                'filled');
 
         case "line"
             plot(ax, X{k}, Y{k}, ...
                 'Color', color, ...
-                'LineStyle', lineStyle, ...
+                'LineStyle', styles{styleIndex}, ...
                 'LineWidth', 1.4);
 
         case "line+markers"
@@ -173,44 +195,60 @@ set(ax, ...
     'TickDir', 'out', ...
     'Box', 'off', ...
     'Layer', 'top', ...
-    'XColor', [0.15 0.15 0.15], ...
-    'YColor', [0.15 0.15 0.15]);
+    'XColor', [0.15 0.15 0.15]);
+
+% , ...
+%     'YColor', [0.15 0.15 0.15]
 
 xlabel(ax, opts.XLabel, ...
     'FontName', 'Times New Roman', ...
     'FontSize', 10, ...
     'Interpreter', 'tex');
 
-ylabel(ax, opts.YLabel, ...
-    'FontName', 'Times New Roman', ...
-    'FontSize', 10, ...
-    'Interpreter', 'tex');
 
-if strlength(opts.Title) > 0
-    title(ax, opts.Title, ...
+
+%% Y-axis formatting
+
+if useRightAxis
+    % Left Y-axis
+    yyaxis(ax, 'left');
+
+    ylabel(ax, opts.YLabel, ...
         'FontName', 'Times New Roman', ...
-        'FontSize', 10, ...
-        'FontWeight', 'normal', ...
-        'Interpreter', 'tex');
-end
+        'FontSize', 10);
 
-if opts.Grid
-    grid(ax, 'on');
-    ax.GridColor = [0.75 0.75 0.75];
-    ax.GridAlpha = 0.18;
-    ax.XMinorGrid = 'off';
-    ax.YMinorGrid = 'off';
+    if all(isfinite(opts.YLim))
+        ylim(ax, opts.YLim);
+    end
+
+    % Right Y-axis
+    yyaxis(ax, 'right');
+
+    ylabel(ax, opts.YLabelRight, ...
+        'FontName', 'Times New Roman', ...
+        'FontSize', 10);
+
+    if all(isfinite(opts.YLimRight))
+        ylim(ax, opts.YLimRight);
+    end
+
+    % Neutral axis colors
+    ax.YAxis(1).Color = [0.15 0.15 0.15];
+    ax.YAxis(2).Color = [0.15 0.15 0.15];
+
+    % Return to left axis
+    yyaxis(ax, 'left');
+
 else
-    grid(ax, 'off');
+    ylabel(ax, opts.YLabel, ...
+        'FontName', 'Times New Roman', ...
+        'FontSize', 10);
+
+    if all(isfinite(opts.YLim))
+        ylim(ax, opts.YLim);
+    end
 end
 
-if all(isfinite(opts.XLim))
-    xlim(ax, opts.XLim);
-end
-
-if all(isfinite(opts.YLim))
-    ylim(ax, opts.YLim);
-end
 
 %% Legend
 if ~isempty(labels)
