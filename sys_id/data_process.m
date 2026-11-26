@@ -37,7 +37,7 @@ plot(thrust)
 
 %% Thrust data prep
 clc; clear; close all;
-
+%%
 % Configuration
 Fs = 20;                   % Resampling frequency [Hz]
 outlierWindow = 21;        % Moving median window [samples]

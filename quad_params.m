@@ -3,6 +3,7 @@ clc;clear;
 
 %%
 Ts = 0.001;
+Ts_h = 0.05;
 
 h = 0.20;               % Hull height [m]
 
@@ -31,7 +32,10 @@ z_float = h/2 - c_float;
 init_h = 0.03;
 end_h = 0.03;
 
-% U_max = 4*17;
+%% UASV
+
+m_prop = 0.01;
+W = 1.34 + 4*m_prop;
 
 Ixx = 0.02448;
 Iyy = 0.01352;
@@ -39,33 +43,22 @@ Izz = 0.03479;
 
 inertia_mx = [Ixx; Iyy; Izz;];
 
-% Continuous-time ADRC
-adrc.z     = makeADRC(7,   3,  1);
-adrc.x     = makeADRC(1.5, 10, 1/W);
-adrc.y     = makeADRC(1.5, 10, 1/W);
-adrc.roll  = makeADRC(15,  2.5,  1/Ixx);
-adrc.pitch = makeADRC(15,  2.5,  1/Iyy);
-adrc.yaw   = makeADRC(5,   8,  1/Izz);
-
-% Discrete-time ADRC, wc, kESO, b0
-adrcD.z     = makeADRC_D(8,  2.5,  1,     Ts);
-adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.roll  = makeADRC_D(15,  2.5,  (180/pi)*(1/Ixx), Ts);
-adrcD.pitch = makeADRC_D(15,  2.5,  (180/pi)*(1/Iyy), Ts);
-adrcD.yaw   = makeADRC_D(8,  2,  1000,  Ts);
-
+% Max RPM
 max_RPM = 138284 / 7;
-
 max_rad_s = max_RPM * 2 * pi / 60;
 max_rad_s_2 = max_rad_s ^ 2;
 
-RPM_Max = max_rad_s_2;
-
+% TD parameters
 r0_position = 1;
+r0_angle = 1000;
 h0 = Ts;
+h0_angle = Ts * 10;
 
+r0_h = 1;
+
+h0_h = Ts_h;
 arm_L = 0.350;
+% arm_L = 0.250;
 
 km = 2.3077e-08;
 kf = 1.5715e-06;
@@ -79,6 +72,78 @@ Alloc = [ kf,     kf,     kf,     kf;
           km,    -km,     km,    -km ];
 
 K_alloc = Alloc \ diag([W, 1, 1, 1]);
+
+
+% Discrete-time ADRC, wc, kESO, b0
+adrcD.z     = makeADRC_D(3,  2,  1,     Ts_h);
+adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
+adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
+adrcD.roll  = makeADRC_D(15,  2.5,  (180/pi)*(1/Ixx), Ts);
+adrcD.pitch = makeADRC_D(15,  2.5,  (180/pi)*(1/Iyy), Ts);
+adrcD.yaw   = makeADRC_D(8,  2, (180/pi)*(1/Izz),  Ts);
+
+% Continuous-time ADRC
+adrc.z     = makeADRC(7,   3,  1);
+adrc.x     = makeADRC(1.5, 10, 1/W);
+adrc.y     = makeADRC(1.5, 10, 1/W);
+adrc.roll  = makeADRC(15,  2.5,  1/Ixx);
+adrc.pitch = makeADRC(15,  2.5,  1/Iyy);
+adrc.yaw   = makeADRC(5,   8,  1/Izz);
+%% FPV
+
+m_prop = 0.01;
+W = 0.7 + 4*m_prop;
+
+Ixx = 0.02448;
+Iyy = 0.01352;
+Izz = 0.03479;
+
+inertia_mx = [Ixx; Iyy; Izz;];
+
+% Max RPM
+max_RPM = 138284 / 7;
+max_rad_s = max_RPM * 2 * pi / 60;
+max_rad_s_2 = max_rad_s ^ 2;
+
+% TD parameters
+r0_position = 1;
+r0_angle = 1000;
+h0 = Ts;
+h0_angle = Ts * 10;
+
+r0_h = 1;
+
+h0_h = Ts_h;
+arm_L = 0.250;
+
+km = 2.3077e-08;
+kf = 1.5715e-06;
+kf_dshot = 2.0447e-06;
+
+
+Alloc = [ kf,     kf,     kf,     kf;
+          0,  -kf*arm_L,      0,   kf*arm_L;
+        -kf*arm_L,      0,   kf*arm_L,      0;
+          km,    -km,     km,    -km ];
+
+K_alloc = Alloc \ diag([W, 1, 1, 1]);
+
+% Discrete-time ADRC, wc, kESO, b0
+adrcD.z     = makeADRC_D(3,  2,  1,     Ts_h);
+adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
+adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
+adrcD.roll  = makeADRC_D(15,  2.5,  (180/pi)*(1/Ixx), Ts);
+adrcD.pitch = makeADRC_D(15,  2.5,  (180/pi)*(1/Iyy), Ts);
+adrcD.yaw   = makeADRC_D(8,  2, (180/pi)*(1/Izz),  Ts);
+
+% Continuous-time ADRC
+adrc.z     = makeADRC(7,   3,  1);
+adrc.x     = makeADRC(1.5, 10, 1/W);
+adrc.y     = makeADRC(1.5, 10, 1/W);
+adrc.roll  = makeADRC(15,  2.5,  1/Ixx);
+adrc.pitch = makeADRC(15,  2.5,  1/Iyy);
+adrc.yaw   = makeADRC(5,   8,  1/Izz);
+
 
 %%
 % Trajectory parameters

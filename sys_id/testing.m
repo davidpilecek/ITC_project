@@ -1,3 +1,16 @@
+
+clc;clear;close all;
+
+test1 = readtable('ATT008.csv');
+
+plot(test1.roll_deg)
+hold on
+plot(test1.pitch_deg)
+hold on
+plot(test1.yaw_deg)
+
+legend("roll", "pitch", "yaw")
+
 %%
 max_RPM = 138284 / 7;
 
