@@ -1,0 +1,90 @@
+%% Thrust data prep
+clc; clear; close all;
+
+% Configuration
+Fs = 20;                   % Resampling frequency [Hz]
+outlierWindow = 21;        % Moving median window [samples]
+motorPoles = 7;            % ESC eRPM / mechanical RPM divisor
+
+% Load data
+rc = readtable('d2/log4.csv');
+sd = readtable('d2/RL0019.csv');
+
+% Trim measurements
+rc = rc(751:end-301, :);
+sd = sd(1:end-5, :);
+
+t = rc.Time_s_ - rc.Time_s_(1);
+thrust = -rc.Thrust_kgf_;
+thrust = thrust - thrust(1);
+
+time_sd = sd.time_ms - sd.time_ms(1);
+time_sd = time_sd / 1000;
+dshot = sd.rl_dshot;
+
+% dshot = sd.rl_dshot / 3200;
+
+% 
+% figure
+% plot(time_sd, dshot)
+% hold on
+% plot(t, thrust)
+
+%% Sort and resample
+% Ensure all signals remain aligned
+[t, idx] = sort(t);
+
+thrust = thrust(idx);
+
+% Remove duplicate timestamps
+[t, idx] = unique(t, 'stable');
+thrust = thrust(idx);
+
+% Uniform time vector
+tUniform = (t(1):1/Fs:t(end)).';
+
+% Interpolate signals
+thrustUniform = interp1(t, thrust, tUniform, 'linear');
+
+thrustUniform = thrustUniform(50:end-30, :);
+dshot = dshot(50:end-30, :);
+tUniform = tUniform(50:end-30, :);
+%
+figure
+plot(tUniform, thrustUniform)
+hold on
+plot(tUniform, dshot)
+
+%%
+
+% Fit a quadratic thrust model from optical RPM squared
+dshot_2 = dshot .^ 2;
+thrust_N = thrustUniform * 9.81;
+t_clean = thrust;
+
+valid = isfinite(dshot_2) & isfinite(thrust_N);
+thrustModel = polyfit(dshot_2(valid), thrust_N(valid), 1);
+thrustPredicted = polyval(thrustModel, dshot_2);
+
+kf = thrustModel(1)
+
+figure
+plot(dshot_2, thrust_N(valid), '.', 'DisplayName', 'Measured')
+hold on
+plot(dshot_2, thrustPredicted(valid), 'LineWidth', 1.5, ...
+    'DisplayName', 'Linear fit')
+xlabel('Optical RPM^2')
+ylabel('Thrust [N]')
+legend('Location', 'best')
+grid on
+
+% Compare measured thrust with the fitted optical-RPM model
+figure
+plot(tUniform,  thrust_N, 'DisplayName', 'Measured thrust')
+hold on
+plot(tUniform, thrustPredicted, 'LineWidth', 1.5, ...
+    'DisplayName', 'Model prediction')
+xlabel('Time (s)')
+ylabel('Thrust (N)')
+legend('Location', 'best')
+grid on

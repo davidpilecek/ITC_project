@@ -45,22 +45,33 @@ motorPoles = 7;            % ESC eRPM / mechanical RPM divisor
 
 % Load data
 rc = readtable('d2/log4.csv');
+sd = readtable('d2/RL0019.csv');
 
 % Trim measurements
 rc = rc(751:end-301, :);
-
-% Extract signals
+sd = sd(1:end-5, :);
 
 t = rc.Time_s_ - rc.Time_s_(1);
 thrust = -rc.Thrust_kgf_;
 thrust = thrust - thrust(1);
 rpmOptical = rc.MotorOpticalSpeed_RPM_;
 
-figure;
-scatter(rpmOptical, thrust, 5, 'filled');
-xlabel('Angular velocity (rad/s)');
-ylabel('Thrust (kgf)');
-grid on;
+time_sd = sd.time_ms - sd.time_ms(1);
+time_sd = time_sd / 1000;
+dshot = sd.rl_dshot;
+% dshot = sd.rl_dshot / 3200;
+
+figure
+plot(time_sd, dshot)
+hold on
+
+plot(t, thrust)
+
+% figure;
+% scatter(rpmOptical, thrust, 5, 'filled');
+% xlabel('Angular velocity (rad/s)');
+% ylabel('Thrust (kgf)');
+% grid on;
 
 %% Sort and resample
 % Ensure all signals remain aligned

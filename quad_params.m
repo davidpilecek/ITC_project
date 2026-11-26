@@ -51,8 +51,8 @@ adrc.yaw   = makeADRC(5,   8,  1/Izz);
 adrcD.z     = makeADRC_D(8,  2.5,  1,     Ts);
 adrcD.x     = makeADRC_D(2,   8,  1/W,   Ts);
 adrcD.y     = makeADRC_D(2,   8,  1/W,   Ts);
-adrcD.roll  = makeADRC_D(15,  2.5,  1/Ixx, Ts);
-adrcD.pitch = makeADRC_D(15,  2.5,  1/Iyy, Ts);
+adrcD.roll  = makeADRC_D(15,  2.5,  (180/pi)*(1/Ixx), Ts);
+adrcD.pitch = makeADRC_D(15,  2.5,  (180/pi)*(1/Iyy), Ts);
 adrcD.yaw   = makeADRC_D(8,  2,  1000,  Ts);
 
 max_RPM = 138284 / 7;
@@ -69,6 +69,7 @@ arm_L = 0.350;
 
 km = 2.3077e-08;
 kf = 1.5715e-06;
+kf_dshot = 2.0447e-06;
 
 max_thrust = max_rad_s_2 * kf * 4;
 
