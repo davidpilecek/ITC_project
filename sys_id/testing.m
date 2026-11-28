@@ -1,15 +1,26 @@
 
 clc;clear;close all;
 
-test1 = readtable('ATT008.csv');
+test1 = readtable('ATT026.csv');
 
 plot(test1.roll_deg)
 hold on
 plot(test1.pitch_deg)
 hold on
 plot(test1.yaw_deg)
-
 legend("roll", "pitch", "yaw")
+
+% figure
+% plot(test1.roll_deg)
+% yyaxis left
+% plot(test1.roll_alloc_Nm)
+
+% figure
+% plot(test1.yaw_deg)
+% figure
+% plot(test1.yaw_req_Nm)
+% hold on
+% plot(test1.yaw_alloc_Nm)
 
 %%
 max_RPM = 138284 / 7;
